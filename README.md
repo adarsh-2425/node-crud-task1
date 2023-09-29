@@ -19,7 +19,7 @@
     npm i
     ```
 
-3. Configure your MongoDB connection in src/config/keys.ts.
+3. Configure your MongoDB connection in .env/MONGODB_URI
 
 4. Start the server
     ```shell
