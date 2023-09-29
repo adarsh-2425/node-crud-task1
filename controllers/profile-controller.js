@@ -18,22 +18,26 @@ exports.updateProfile = async(req, res) => {
     const user = req.user;
     const imagesUpload = req.file ? req.file.filename : ''; 
     try {
-        const User = await UserModel.findById(user.userId);
+        const { name, email, password } = req.body;
 
-        // fetch new data
-        const { name, email, password, profileImage } = req.body;
+        const updatedData = {
+            name: name,
+            email: email || user.email,
+            password: password || user.password,
+            profileImage: imagesUpload || user.profileImage,
+        };
 
-        User.name = name;
-        User.email = email || User.email;
-        User.password = password || User.password;
-        User.profileImage = imagesUpload || user.profileImage;
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            user.userId,
+            updatedData,
+            { new: true }
+        ).select('-password') //exclude password field
 
-        //findbyidandupdate
-        
+        if (!updatedUser) {
+            return res.status(404).send({ error: "User not found" });
+        }
 
-        // save book
-        await User.save();
-        res.status(201).send({message: "Userdata updated"})
+        res.status(200).send({ message: "User data updated", user: updatedUser });
 
     } catch(err) {
         console.error(err.message);
